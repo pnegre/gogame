@@ -82,6 +82,21 @@ func PollEvent() Event {
 
 }
 
+// Process events. Returns true if QuitEvent has appeared
+func SlurpEvents() (quit bool) {
+	quit = false
+	for {
+		ev := PollEvent()
+		if ev == nil {
+			return
+		}
+		switch ev.(type) {
+		case *QuitEvent:
+			quit = true
+		}
+	}
+}
+
 func IsKeyPressed(kcode int) bool {
 	return C.isKeyPressed(C.int(kcode)) == 1
 }
