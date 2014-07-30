@@ -2,11 +2,23 @@
 
 This is a simple 2D game library for Go. It's incomplete and I'm writing it for my personal projects. Feel free to suggest features!!
 
-## Install instructions
+## Install instructions (linux only)
 
-Just the usual way:
+I use debian. If you're like me, you will need to install the following packages:
+
+    libsdl2-dev
+    libsdl2-image-dev
+    libsdl2-ttf-dev
+
+Others distros shoud have equivalent libraries avaliable.
+
+And now, the easy part (make sure you have a valid $GOPATH):
 
     go get github.com/pnegre/gogame
+
+## Documentation
+
+In progress...
 
 ## Usage
 
