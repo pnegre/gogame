@@ -1,4 +1,6 @@
-# GOGAME: A simple 2D game library for GO
+# GOGAME
+
+This is a simple 2D game library for Go. It's incomplete and I'm writing it for my personal projects. Feel free to suggest features!!
 
 ## Install instructions
 
