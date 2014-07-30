@@ -18,7 +18,9 @@ And now, the easy part (make sure you have a valid $GOPATH):
 
 ## Documentation
 
-In progress...
+Once you have installed the package, just run:
+
+    godoc github.com/pnegre/gogame | less
 
 ## Usage
 
