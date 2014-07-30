@@ -44,19 +44,21 @@ Simple example:
 
     type Target struct {
         *sprite.Simple
-        x, y int
     }
 
     func NewTarget() *Target {
         tex := cache.GetTexture(IMAGE)
-        return &Target{sprite.NewSimple(tex), WIN_W / 2, WIN_H / 2}
+        s := sprite.NewSimple(tex)
+        s.Rect.SetCenter(WIN_W/2, WIN_H/2)
+        return &Target{s}
     }
 
     func (self *Target) Update() {
-        self.x += 10
-        self.Rect.SetCenter(self.x, self.y)
-        if self.x >= WIN_W {
-            self.x = 0
+        if gogame.IsKeyPressed(gogame.K_LEFT) {
+            self.Rect.X -= 10
+        }
+        if gogame.IsKeyPressed(gogame.K_RIGHT) {
+            self.Rect.X += 10
         }
     }
 
@@ -68,19 +70,10 @@ Simple example:
         defer cache.DestroyAll()
 
         target := NewTarget()
-        quit := false
-        for !quit {
-            for {
-                var ev gogame.Event
-                if ev = gogame.PollEvent(); ev == nil {
-                    break
-                }
 
-                switch ev.(type) {
-
-                case *gogame.QuitEvent:
-                    quit = true
-                }
+        for {
+            if quit := gogame.SlurpEvents(); quit == true {
+                break
             }
 
             target.Update()
@@ -93,3 +86,5 @@ Simple example:
         }
 
     }
+
+
