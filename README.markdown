@@ -21,6 +21,14 @@ And now, the easy part (make sure you have a valid $GOPATH):
 Once you have installed the package, just run:
 
     godoc github.com/pnegre/gogame | less
+    godoc github.com/pnegre/gogame/sprite | less
+    godoc github.com/pnegre/gogame/cache | less
+
+Or you may prefer to view on the web browser:
+
+    godoc -http=:6060
+
+Point your browser to http://localhost:6060/pkg/github.com/pnegre/gogame
 
 ## Usage
 
