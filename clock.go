@@ -10,12 +10,14 @@ type Clock struct {
 	totalDuration int64
 }
 
+// Constructs new Clock object. Can be used to track time and control a game's framerate.
 func NewClock(fps int) *Clock {
 	frameDuration := int64(1e9 / fps)
 	log.Println(frameDuration)
 	return &Clock{frameDuration: frameDuration}
 }
 
+// Must be called once per frame. Limit framerate to internal value (provided on the object creation)
 func (self *Clock) Wait() {
 	self.ticks++
 	if self.lastTime == 0 {

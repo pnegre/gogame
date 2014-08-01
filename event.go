@@ -46,6 +46,7 @@ type KeyEvent struct {
 	Down bool
 }
 
+// Poll for pending envents. Return nil if there is no event available
 func PollEvent() Event {
 	var cev C.SDL_Event
 
@@ -97,6 +98,7 @@ func SlurpEvents() (quit bool) {
 	}
 }
 
+// Returns true if key is pressed, false otherwise
 func IsKeyPressed(kcode int) bool {
 	return C.isKeyPressed(C.int(kcode)) == 1
 }
