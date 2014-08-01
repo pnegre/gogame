@@ -19,6 +19,7 @@ func registerSprite(sp Sprite, g *Group) {
 	infoSprites[sp] = gl
 }
 
+// Remove the sprite from all groups
 func KillFromAllGroups(s Sprite) {
 	if gl, ok := infoSprites[s]; ok {
 		for _, g := range gl {
@@ -29,7 +30,7 @@ func KillFromAllGroups(s Sprite) {
 
 }
 
-// Check if two sprites are colliding
+// Check if two sprites are colliding, using rects
 func Collide(c1, c2 Sprite) bool {
 	r1 := c1.GetRect()
 	r2 := c2.GetRect()
@@ -43,25 +44,30 @@ type Sprite interface {
 	Draw()
 }
 
+// Container to hold and manage multiple sprite objects
 type Group struct {
 	sprList *list.List
 }
 
+// Creates new container
 func NewGroup() *Group {
 	g := new(Group)
 	g.sprList = list.New()
 	return g
 }
 
+// Add new sprite to group
 func (self *Group) Add(s Sprite) {
 	self.sprList.PushFront(s)
 	registerSprite(s, self)
 }
 
+// Get number of sprites of this group
 func (self *Group) Len() int {
 	return self.sprList.Len()
 }
 
+// Get sprite number "n" from this group
 func (self *Group) GetElement(n int) Sprite {
 	e := self.sprList.Front()
 	i := 0
@@ -75,6 +81,7 @@ func (self *Group) GetElement(n int) Sprite {
 	return nil
 }
 
+// Calls the Update() method on all sprites in this group
 func (self *Group) Update() {
 	e := self.sprList.Front()
 	for e != nil {
@@ -84,6 +91,7 @@ func (self *Group) Update() {
 	}
 }
 
+// Calls the Draw() method on all sprites in this group
 func (self *Group) Draw() {
 	for e := self.sprList.Front(); e != nil; e = e.Next() {
 		s := e.Value.(Sprite)
@@ -91,6 +99,7 @@ func (self *Group) Draw() {
 	}
 }
 
+// Remove sprite from group
 func (self *Group) Remove(sp Sprite) {
 	var le *list.Element
 	for e := self.sprList.Front(); e != nil; e = e.Next() {
@@ -107,6 +116,7 @@ func (self *Group) Remove(sp Sprite) {
 
 }
 
+// Find the sprite in this group that collides with the provided sprite.
 func (self *Group) CollideSpr(sp Sprite) (Sprite, bool) {
 	for e := self.sprList.Front(); e != nil; e = e.Next() {
 		s := e.Value.(Sprite)
@@ -118,7 +128,7 @@ func (self *Group) CollideSpr(sp Sprite) (Sprite, bool) {
 }
 
 // Check if any two of sprites of the two groups collide
-// returns the sprites colliding (group1, group2)
+// returns the colliding sprites (group1, group2)
 func (self *Group) CollideGroup(g *Group) (Sprite, Sprite, bool) {
 	for e := g.sprList.Front(); e != nil; e = e.Next() {
 		s := e.Value.(Sprite)
