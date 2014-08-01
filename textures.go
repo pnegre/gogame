@@ -39,6 +39,14 @@ void queryTexture(SDL_Texture *t, int *h, int *v) {
     SDL_QueryTexture(t, NULL, NULL, h, v);
 }
 
+int intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2) {
+    static SDL_Rect a;
+    static SDL_Rect b;
+    a.x = x1; a.y = y1; a.w = w1; a.h = h1;
+    b.x = x2; b.y = y2; b.w = w2; b.h = h2;
+    return SDL_HasIntersection(&a, &b);
+}
+
 
 */
 import "C"
@@ -62,6 +70,16 @@ type Rect struct {
 func (self *Rect) SetCenter(x, y int) {
 	self.X = x - self.W/2
 	self.Y = y - self.H/2
+}
+
+// Determine if two rectangles intersect
+func (self *Rect) Intersects(r2 *Rect) bool {
+	if 0 == C.intersects(C.int(self.X), C.int(self.Y), C.int(self.W), C.int(self.H),
+		C.int(r2.X), C.int(r2.Y), C.int(r2.W), C.int(r2.H)) {
+		return false
+	}
+
+	return true
 }
 
 // Construct a new texture from a image file

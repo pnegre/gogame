@@ -33,17 +33,8 @@ func KillFromAllGroups(s Sprite) {
 func Collide(c1, c2 Sprite) bool {
 	r1 := c1.GetRect()
 	r2 := c2.GetRect()
-	left1, left2 := r1.X, r2.X
-	right1, right2 := r1.X+r1.W, r2.X+r2.W
-	top1, top2 := r1.Y, r2.Y
-	bottom1, bottom2 := r1.Y+r1.H, r2.Y+r2.H
-
-	if left1 <= right2 && left2 <= right1 && top1 <= bottom2 && top2 <= bottom1 {
-		// TODO: check for pixel perfect collision. Check alpha components of the two textures
-		return true
-	}
-
-	return false
+	// TODO: check for pixel perfect collision. Check alpha components of the two textures
+	return r1.Intersects(r2)
 }
 
 type Sprite interface {
