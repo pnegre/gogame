@@ -37,11 +37,11 @@ const (
 
 type Event interface{}
 
-type QuitEvent interface{}
+type EventQuit interface{}
 
-type UnknownEvent interface{}
+type EventUnknown interface{}
 
-type KeyEvent struct {
+type EventKey struct {
 	Code int
 	Down bool
 }
@@ -58,32 +58,32 @@ func PollEvent() Event {
 		switch C.getEventType(&cev) {
 
 		case C.SDL_QUIT:
-			return new(QuitEvent)
+			return new(EventQuit)
 
 		case C.SDL_KEYDOWN:
 			// Ignore repeat key events
 			if C.isKeyRepeat(&cev) != 0 {
 				break
 			}
-			kde := new(KeyEvent)
+			kde := new(EventKey)
 			kde.Code = int(C.getKeyCode(&cev))
 			kde.Down = true
 			return kde
 
 		case C.SDL_KEYUP:
-			kde := new(KeyEvent)
+			kde := new(EventKey)
 			kde.Code = int(C.getKeyCode(&cev))
 			kde.Down = false
 			return kde
 
 		default:
-			return new(UnknownEvent)
+			return new(EventUnknown)
 		}
 	}
 
 }
 
-// Process events. Returns true if QuitEvent has appeared
+// Process events. Returns true if EventQuit has appeared
 func SlurpEvents() (quit bool) {
 	quit = false
 	for {
@@ -92,7 +92,7 @@ func SlurpEvents() (quit bool) {
 			return
 		}
 		switch ev.(type) {
-		case *QuitEvent:
+		case *EventQuit:
 			quit = true
 		}
 	}
