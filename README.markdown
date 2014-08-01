@@ -16,6 +16,10 @@ And now, the easy part (make sure you have a valid $GOPATH):
 
     go get github.com/pnegre/gogame
 
+Finally, compile the library and install it:
+
+    go install github.com/pnegre/gogame
+
 ## Documentation
 
 Once you have installed the package, just run:
