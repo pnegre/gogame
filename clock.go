@@ -8,6 +8,7 @@ type Clock struct {
 	lastTime      int64
 	ticks         int64
 	totalDuration int64
+	avgFPS        float64
 }
 
 // Constructs new Clock object. Can be used to track time and control a game's framerate.
@@ -35,9 +36,13 @@ func (self *Clock) Wait() {
 	self.lastTime = t
 
 	if self.ticks > 500 {
-		fps := float64(1.0) / ((float64(self.totalDuration) / float64(1e9)) / float64(self.ticks))
-		log.Printf("Clock. FPS: %.2f", fps)
+		self.avgFPS = float64(1.0) / ((float64(self.totalDuration) / float64(1e9)) / float64(self.ticks))
 		self.totalDuration = 0
 		self.ticks = 0
 	}
+}
+
+// Gets averaged Frames Per Second. Updated every 500 iterations
+func (self *Clock) GetFPS() float64 {
+	return self.avgFPS
 }

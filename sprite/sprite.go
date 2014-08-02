@@ -91,6 +91,11 @@ func (self *Group) Update() {
 	}
 }
 
+// Clears group list
+func (self *Group) Clear() {
+	self.sprList = list.New()
+}
+
 // Calls the Draw() method on all sprites in this group
 func (self *Group) Draw() {
 	for e := self.sprList.Front(); e != nil; e = e.Next() {

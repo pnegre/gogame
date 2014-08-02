@@ -4,7 +4,9 @@ import "github.com/pnegre/gogame"
 import "log"
 
 var texCache = make(map[string]*gogame.Texture)
+var fontCache = make(map[namesize]*gogame.Font)
 
+// Gets texture from cache. Creates it if necessary.
 func GetTexture(name string) *gogame.Texture {
 	if v, ok := texCache[name]; ok {
 		return v
@@ -16,6 +18,7 @@ func GetTexture(name string) *gogame.Texture {
 	return tex
 }
 
+// Destroy all textures from cache
 func DestroyTextures() {
 	for _, v := range texCache {
 		log.Printf("Destroying texture %v", v)
@@ -28,8 +31,7 @@ type namesize struct {
 	size int
 }
 
-var fontCache = make(map[namesize]*gogame.Font)
-
+// Gets font from cache. Creates it if necessary.
 func GetFont(name string, size int) *gogame.Font {
 	ns := namesize{name, size}
 	if v, ok := fontCache[ns]; ok {
@@ -42,6 +44,7 @@ func GetFont(name string, size int) *gogame.Font {
 	return f
 }
 
+// Destroy all fonts from cache
 func DestroyFonts() {
 	for k, v := range fontCache {
 		log.Printf("Destroying font %v", k)
@@ -49,6 +52,7 @@ func DestroyFonts() {
 	}
 }
 
+// Destroy all textures and fonts from cache
 func DestroyAll() {
 	DestroyFonts()
 	DestroyTextures()
