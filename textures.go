@@ -31,8 +31,20 @@ void render2( SDL_Renderer *ren, SDL_Texture *tex, int x, int y, int w, int h, i
     org.w = w;
     org.h = h;
     SDL_RenderCopy(ren, tex, &org, &dst);
+}
 
-
+void render3( SDL_Renderer *ren, SDL_Texture *tex, int w, int h, int x, int y, int dx, int dy) {
+    static SDL_Rect org;
+    static SDL_Rect dst;
+    org.x = 0;
+    org.y = 0;
+    org.w = w;
+    org.h = h;
+    dst.x = x;
+    dst.y = y;
+    dst.w = dx;
+    dst.h = dy;
+    SDL_RenderCopy(ren, tex, &org, &dst);
 }
 
 void queryTexture(SDL_Texture *t, int *h, int *v) {
@@ -125,6 +137,12 @@ func (self *Texture) BlitRect(r *Rect) {
 func (self *Texture) BlitToScreen(x, y int) {
 	C.render(renderer, self.tex, C.int(x), C.int(y),
 		C.int(self.w), C.int(self.h))
+}
+
+// Blit texture to screen, stretching the image
+func (self *Texture) BlitToScreenStretch(dst *Rect) {
+	C.render3(renderer, self.tex, C.int(self.w), C.int(self.h),
+		C.int(dst.X), C.int(dst.Y), C.int(dst.W), C.int(dst.H))
 }
 
 // Get subtexture
