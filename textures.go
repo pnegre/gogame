@@ -112,7 +112,8 @@ func (self *Texture) Blit(x, y int) {
 
 // Blit texture to screen, using provided rect
 func (self *Texture) BlitRect(r *Rect) {
-	self.Blit(r.X, r.Y)
+	C.renderGOOD(renderer, self.tex, C.int(0), C.int(0), C.int(r.X), C.int(r.Y), C.int(self.realw),
+		C.int(self.realh), C.int(r.W), C.int(r.H))
 }
 
 // Get subtexture
@@ -138,7 +139,8 @@ func (self *SubTexture) Blit(x, y int) {
 
 // Blit subtexture to screen, using provided rect
 func (self *SubTexture) BlitRect(r *Rect) {
-	self.Blit(r.X, r.Y)
+	C.renderGOOD(renderer, self.tex.tex, C.int(self.rect.X), C.int(self.rect.Y), C.int(r.X), C.int(r.Y), C.int(self.rect.W),
+		C.int(self.rect.H), C.int(r.W), C.int(r.H))
 }
 
 // Get subtexture dimensions
