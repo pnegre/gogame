@@ -10,40 +10,17 @@ SDL_Texture * makeTexture( char *f, SDL_Renderer *ren ) {
     return tex;
 }
 
-void render( SDL_Renderer *ren, SDL_Texture *tex, int x, int y, int w, int h) {
-    static SDL_Rect dst;
-    dst.x = x;
-    dst.y = y;
-    dst.w = w;
-    dst.h = h;
-    SDL_RenderCopy(ren, tex, NULL, &dst);
-}
-
-void render2( SDL_Renderer *ren, SDL_Texture *tex, int x, int y, int w, int h, int ox, int oy) {
+void renderGOOD( SDL_Renderer *ren, SDL_Texture *tex, int ox, int oy, int x, int y, int w, int h, int dw, int dh) {
     static SDL_Rect org;
     static SDL_Rect dst;
-    dst.x = x;
-    dst.y = y;
-    dst.w = w;
-    dst.h = h;
     org.x = ox;
     org.y = oy;
     org.w = w;
     org.h = h;
-    SDL_RenderCopy(ren, tex, &org, &dst);
-}
-
-void render3( SDL_Renderer *ren, SDL_Texture *tex, int w, int h, int x, int y, int dx, int dy) {
-    static SDL_Rect org;
-    static SDL_Rect dst;
-    org.x = 0;
-    org.y = 0;
-    org.w = w;
-    org.h = h;
     dst.x = x;
     dst.y = y;
-    dst.w = dx;
-    dst.h = dy;
+    dst.w = dw;
+    dst.h = dh;
     SDL_RenderCopy(ren, tex, &org, &dst);
 }
 
@@ -69,9 +46,11 @@ type Drawable interface {
 }
 
 type Texture struct {
-	tex *C.SDL_Texture
-	w   int
-	h   int
+	tex   *C.SDL_Texture
+	realw int
+	realh int
+	dstw  int
+	dsth  int
 }
 
 type Rect struct {
@@ -106,15 +85,14 @@ func getNewTexture(tex *C.SDL_Texture) *Texture {
 	var w C.int
 	var h C.int
 	C.queryTexture(t.tex, &w, &h)
-	t.w, t.h = int(w), int(h)
-	// El finalizer no funciona. Suposo, fent proves, que és perquè el Garbage Collector
-	// s'executa dins la seva pròpia goroutine, i sembla que no es pot cridar a
-	// SDL_DestroyTexture si no és des del thread original
-	// 	runtime.SetFinalizer(t, func(t *Texture) {
-	// 		log.Printf("Finalizing texture...")
-	// 		C.SDL_DestroyTexture(t.tex)
-	// 	})
+	t.realw, t.realh = int(w), int(h)
+	t.dstw, t.dsth = t.realw, t.realh
 	return t
+}
+
+func (self *Texture) SetDimensions(h, w int) {
+	self.dstw = w
+	self.dsth = h
 }
 
 // Destroy texture. Must be called explicitly, no automatic free for texture data
@@ -124,41 +102,43 @@ func (self *Texture) Destroy() {
 
 // Get texture dimensions, (horizontal, vertical)
 func (self *Texture) GetDimensions() (int, int) {
-	return self.w, self.h
+	return self.dstw, self.dsth
+}
+
+func (self *Texture) Blit(x, y int) {
+	C.renderGOOD(renderer, self.tex, C.int(0), C.int(0), C.int(x), C.int(y), C.int(self.realw),
+		C.int(self.realh), C.int(self.dstw), C.int(self.dsth))
 }
 
 // Blit texture to screen, using provided rect
 func (self *Texture) BlitRect(r *Rect) {
-	C.render(renderer, self.tex, C.int(r.X), C.int(r.Y),
-		C.int(r.W), C.int(r.H))
-}
-
-// Blit texture to screen, using x,y coordinates (top-left corner)
-func (self *Texture) BlitToScreen(x, y int) {
-	C.render(renderer, self.tex, C.int(x), C.int(y),
-		C.int(self.w), C.int(self.h))
-}
-
-// Blit texture to screen, stretching the image
-func (self *Texture) BlitToScreenStretch(dst *Rect) {
-	C.render3(renderer, self.tex, C.int(self.w), C.int(self.h),
-		C.int(dst.X), C.int(dst.Y), C.int(dst.W), C.int(dst.H))
+	self.Blit(r.X, r.Y)
 }
 
 // Get subtexture
 func (self *Texture) SubTex(x, y, w, h int) *SubTexture {
-	return &SubTexture{self, &Rect{x, y, w, h}}
+	return &SubTexture{self, &Rect{x, y, w, h}, w, h}
 }
 
 type SubTexture struct {
-	tex  *Texture
-	rect *Rect
+	tex        *Texture
+	rect       *Rect
+	dstw, dsth int
+}
+
+func (self *SubTexture) SetDimensions(w, h int) {
+	self.dstw = w
+	self.dsth = h
+}
+
+func (self *SubTexture) Blit(x, y int) {
+	C.renderGOOD(renderer, self.tex.tex, C.int(self.rect.X), C.int(self.rect.Y), C.int(x), C.int(y), C.int(self.rect.W),
+		C.int(self.rect.H), C.int(self.dstw), C.int(self.dsth))
 }
 
 // Blit subtexture to screen, using provided rect
 func (self *SubTexture) BlitRect(r *Rect) {
-	C.render2(renderer, self.tex.tex, C.int(r.X), C.int(r.Y), C.int(r.W),
-		C.int(r.H), C.int(self.rect.X), C.int(self.rect.Y))
+	self.Blit(r.X, r.Y)
 }
 
 // Get subtexture dimensions

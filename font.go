@@ -45,7 +45,7 @@ func (self *Font) GetTexture(text string, color *Color) *Texture {
 // Render directly to screen. Creates texture and discards it after rendering to screen
 func (self *Font) RenderToScreen(text string, x, y int, color *Color) {
 	tex := self.GetTexture(text, color)
-	tex.BlitToScreen(x, y)
+	tex.Blit(x, y)
 	tex.Destroy()
 }
 
@@ -55,6 +55,6 @@ func (self *Font) RenderToScreenCenter(text string, x, y int, color *Color) {
 	w, h := tex.GetDimensions()
 	xx := x - w/2
 	yy := y - h/2
-	tex.BlitToScreen(xx, yy)
+	tex.Blit(xx, yy)
 	tex.Destroy()
 }
