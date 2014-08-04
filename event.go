@@ -17,9 +17,18 @@ int isKeyRepeat(SDL_Event *e) {
 }
 
 int isKeyPressed(int kcode) {
-    const Uint8 *state = SDL_GetKeyboardState(NULL);
+    const Uint8 * state = SDL_GetKeyboardState(NULL);
     int sc = SDL_GetScancodeFromKey(kcode);
     return state[sc];
+}
+
+int getWinData(SDL_Event *e, int *w, int *h) {
+    if (e->window.event != SDL_WINDOWEVENT_RESIZED) {
+        return 0;
+    }
+    *w = e->window.data1;
+    *h = e->window.data2;
+    return 1;
 }
 
 */
@@ -33,6 +42,8 @@ const (
 	K_RETURN = C.SDLK_RETURN
 	K_P      = C.SDLK_p
 	K_I      = C.SDLK_i
+	K_M      = C.SDLK_m
+	K_Q      = C.SDLK_q
 )
 
 type Event interface{}
@@ -44,6 +55,10 @@ type EventUnknown interface{}
 type EventKey struct {
 	Code int
 	Down bool
+}
+
+type EventResize struct {
+	W, H int
 }
 
 // Poll for pending envents. Return nil if there is no event available
@@ -75,6 +90,15 @@ func PollEvent() Event {
 			kde.Code = int(C.getKeyCode(&cev))
 			kde.Down = false
 			return kde
+
+		case C.SDL_WINDOWEVENT:
+			var w, h C.int
+			if 1 == C.getWinData(&cev, &w, &h) {
+				wr := new(EventResize)
+				wr.W = int(w)
+				wr.H = int(h)
+				return wr
+			}
 
 		default:
 			return new(EventUnknown)
