@@ -48,6 +48,20 @@ func Init(title string, h, v int) error {
 	return nil
 }
 
+func SetFullScreen(fs bool) {
+	if fs {
+		C.SDL_SetWindowFullscreen(screen, C.SDL_WINDOW_FULLSCREEN_DESKTOP)
+	} else {
+		C.SDL_SetWindowFullscreen(screen, 0)
+	}
+}
+
+func GetWindowSize() (int, int) {
+	var w, h C.int
+	C.SDL_GetWindowSize(screen, &w, &h)
+	return int(w), int(h)
+}
+
 // Set a device independent resolution for rendering
 func SetLogicalSize(h, v int) {
 	C.SDL_RenderSetLogicalSize(renderer, C.int(h), C.int(v))

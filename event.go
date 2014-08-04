@@ -22,13 +22,13 @@ int isKeyPressed(int kcode) {
     return state[sc];
 }
 
-int getWinData(SDL_Event *e, int *w, int *h) {
-    if (e->window.event != SDL_WINDOWEVENT_RESIZED) {
-        return 0;
-    }
+int getWindowEvent(SDL_Event *e) {
+    return e->window.event;
+}
+
+void getWinData(SDL_Event *e, int *w, int *h) {
     *w = e->window.data1;
     *h = e->window.data2;
-    return 1;
 }
 
 */
@@ -44,6 +44,7 @@ const (
 	K_I      = C.SDLK_i
 	K_M      = C.SDLK_m
 	K_Q      = C.SDLK_q
+	K_F      = C.SDLK_f
 )
 
 type Event interface{}
@@ -51,6 +52,8 @@ type Event interface{}
 type EventQuit interface{}
 
 type EventUnknown interface{}
+
+type EventExposed interface{}
 
 type EventKey struct {
 	Code int
@@ -102,12 +105,17 @@ func classifyEvent(cev *C.SDL_Event) Event {
 		return kde
 
 	case C.SDL_WINDOWEVENT:
-		var w, h C.int
-		if 1 == C.getWinData(cev, &w, &h) {
+		wet := C.getWindowEvent(cev)
+		if wet == C.SDL_WINDOWEVENT_RESIZED {
+			var w, h C.int
+			C.getWinData(cev, &w, &h)
 			wr := new(EventResize)
 			wr.W = int(w)
 			wr.H = int(h)
 			return wr
+
+		} else if wet == C.SDL_WINDOWEVENT_EXPOSED {
+			return new(EventExposed)
 		}
 	}
 	return new(EventUnknown)
