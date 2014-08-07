@@ -31,12 +31,29 @@ void getWinData(SDL_Event *e, int *w, int *h) {
     *h = e->window.data2;
 }
 
+void getMouseCoords(SDL_Event *e, int *x, int *y, int *down) {
+    *x = e->button.x;
+    *y = e->button.y;
+    if (e->button.state == SDL_PRESSED) {
+        *down = 1;
+    } else {
+        *down = 0;
+    }
+}
+
+void getMouseWheel(SDL_Event *e, int *x, int *y) {
+    *x = e->wheel.x;
+    *y = e->wheel.y;
+}
+
 */
 import "C"
 
 const (
 	K_LEFT   = C.SDLK_LEFT
 	K_RIGHT  = C.SDLK_RIGHT
+	K_UP     = C.SDLK_UP
+	K_DOWN   = C.SDLK_DOWN
 	K_SPACE  = C.SDLK_SPACE
 	K_ESC    = C.SDLK_ESCAPE
 	K_RETURN = C.SDLK_RETURN
@@ -45,6 +62,7 @@ const (
 	K_M      = C.SDLK_m
 	K_Q      = C.SDLK_q
 	K_F      = C.SDLK_f
+	K_T      = C.SDLK_t
 )
 
 type Event interface{}
@@ -54,6 +72,15 @@ type EventQuit interface{}
 type EventUnknown interface{}
 
 type EventExposed interface{}
+
+type EventMouseClick struct {
+	X, Y int
+	Down bool
+}
+
+type EventMouseWheel struct {
+	X, Y int
+}
 
 type EventKey struct {
 	Code int
@@ -68,6 +95,14 @@ type EventResize struct {
 func WaitEvent() Event {
 	var cev C.SDL_Event
 	if 0 == C.SDL_WaitEvent(&cev) {
+		return nil
+	}
+	return classifyEvent(&cev)
+}
+
+func WaitEventTimeout(timeout int) Event {
+	var cev C.SDL_Event
+	if 0 == C.SDL_WaitEventTimeout(&cev, C.int(timeout)) {
 		return nil
 	}
 	return classifyEvent(&cev)
@@ -117,6 +152,20 @@ func classifyEvent(cev *C.SDL_Event) Event {
 		} else if wet == C.SDL_WINDOWEVENT_EXPOSED {
 			return new(EventExposed)
 		}
+
+	case C.SDL_MOUSEBUTTONDOWN:
+		var x, y, dw C.int
+		var down bool
+		C.getMouseCoords(cev, &x, &y, &dw)
+		if dw == 1 {
+			down = true
+		}
+		return &EventMouseClick{X: int(x), Y: int(y), Down: down}
+
+	case C.SDL_MOUSEWHEEL:
+		var x, y C.int
+		C.getMouseWheel(cev, &x, &y)
+		return &EventMouseWheel{int(x), int(y)}
 	}
 	return new(EventUnknown)
 }
