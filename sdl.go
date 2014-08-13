@@ -37,6 +37,7 @@ type Color struct {
 var COLOR_WHITE = &Color{255, 255, 255, 255}
 var COLOR_BLACK = &Color{0, 0, 0, 255}
 var COLOR_RED = &Color{255, 0, 0, 255}
+var COLOR_BLUE = &Color{0, 0, 255, 255}
 
 // Use this function to create a window and a renderer (not visible to user)
 func Init(title string, h, v int) error {
