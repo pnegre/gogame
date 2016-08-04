@@ -63,6 +63,10 @@ func (self *Rect) SetCenter(x, y int) {
 	self.Y = y - self.H/2
 }
 
+func (self *Rect) GetCenter() (x, y int) {
+	return self.X + self.W/2, self.Y + self.H/2
+}
+
 // Determine if two rectangles intersect
 func (self *Rect) Intersects(r2 *Rect) bool {
 	if 0 == C.intersects(C.int(self.X), C.int(self.Y), C.int(self.W), C.int(self.H),
