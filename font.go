@@ -6,7 +6,7 @@ package gogame
 
 SDL_Texture *getTextureFromFont(SDL_Renderer *ren, TTF_Font *ttf, char *t, unsigned char r, unsigned char g, unsigned char b) {
     SDL_Color color = {r,g,b};
-    SDL_Surface *s = TTF_RenderText_Solid(ttf, t, color);
+    SDL_Surface *s = TTF_RenderText_Blended(ttf, t, color);
     SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, s);
     SDL_FreeSurface(s);
     return tex;
