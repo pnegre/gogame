@@ -194,6 +194,10 @@ func classifyEvent(cev *C.SDL_Event) Event {
 		return kde
 
 	case C.SDL_KEYUP:
+		// Ignore repeat key events
+		if C.isKeyRepeat(cev) != 0 {
+			break
+		}
 		kde := new(EventKey)
 		kde.Code = int(C.getKeyCode(cev))
 		kde.Down = false
