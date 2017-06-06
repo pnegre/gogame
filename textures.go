@@ -65,6 +65,15 @@ void pixel(unsigned char *data, int w, int h, int x, int y, int r, int g, int b)
 	*data++ = (unsigned char) b;
 }
 
+void clear(unsigned char *data, int w, int h) {
+	for(int i=0; i<h; i++)
+		for(int j=0; j<w; j++) {
+			*data++ = 0;
+			*data++ = 0;
+			*data++ = 0;
+		}
+}
+
 */
 import "C"
 
@@ -137,11 +146,7 @@ func (self *Texture) Unlock() {
 }
 
 func (self *Texture) Clear() {
-	for y:=0; y<self.realh; y++ {
-		for x:=0; x<self.realw; x++ {
-			C.pixel(self.data, C.int(self.realw), C.int(self.realh), C.int(x), C.int(y), 0,0,0);
-		}
-	}
+	C.clear(self.data, C.int(self.realw), C.int(self.realh));
 }
 
 func (self *Texture) Pixel(x, y int, color *Color) {
