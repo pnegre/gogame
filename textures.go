@@ -61,7 +61,7 @@ void unlockTexture(SDL_Texture *t) {
 }
 
 void pixel(unsigned char *data, int h, int v, int x, int y, int r, int g, int b) {
-	data += (x+y*h)*24;
+	data += (x+y*h)*3;
 	*data = (unsigned char) r;
 	*data = (unsigned char) g;
 	*data = (unsigned char) b;
