@@ -4,6 +4,8 @@ package gogame
 #cgo pkg-config: sdl2 SDL2_image
 #include "SDL.h"
 #include "SDL_image.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 SDL_Texture * makeTexture( char *f, SDL_Renderer *ren ) {
     SDL_Texture *tex = IMG_LoadTexture(ren, f);
@@ -36,6 +38,34 @@ int intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2) {
     return SDL_HasIntersection(&a, &b);
 }
 
+SDL_Texture *makeEmptyTexture(SDL_Renderer *ren, int w, int h) {
+	SDL_Texture *t = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, w, h);
+	if (t == NULL) {
+		printf("Error creating empty texture: %s\n", SDL_GetError());
+	}
+}
+
+unsigned char *lockTexture(SDL_Texture *t) {
+	void *texture_data;
+	int texture_pitch;
+	if (SDL_LockTexture(t, 0, &texture_data, &texture_pitch) == -1) {
+		printf("Error: %s\n", SDL_GetError());
+	}
+	//unsigned char *td = (unsigned char*) texture_data;
+	//td[0] = (unsigned char) 0;
+	return (unsigned char*) texture_data;
+}
+
+void unlockTexture(SDL_Texture *t) {
+	SDL_UnlockTexture(t);
+}
+
+void pixel(unsigned char *data, int h, int v, int x, int y, int r, int g, int b) {
+	data += (x+y*h)*24;
+	*data = (unsigned char) r;
+	*data = (unsigned char) g;
+	*data = (unsigned char) b;
+}
 
 */
 import "C"
@@ -51,6 +81,7 @@ type Texture struct {
 	realh int
 	dstw  int
 	dsth  int
+	data  *C.uchar
 }
 
 type Rect struct {
@@ -83,6 +114,11 @@ func NewTexture(filename string) *Texture {
 	return getNewTexture(tex)
 }
 
+func NewEmptyTexture(w, h int) *Texture {
+	tex := C.makeEmptyTexture(renderer, C.int(w), C.int(h))
+	return getNewTexture(tex)
+}
+
 func getNewTexture(tex *C.SDL_Texture) *Texture {
 	t := new(Texture)
 	t.tex = tex
@@ -92,6 +128,18 @@ func getNewTexture(tex *C.SDL_Texture) *Texture {
 	t.realw, t.realh = int(w), int(h)
 	t.dstw, t.dsth = t.realw, t.realh
 	return t
+}
+
+func (self *Texture) Lock() {
+	self.data = C.lockTexture(self.tex)
+}
+
+func (self *Texture) Unlock() {
+	C.unlockTexture(self.tex)
+}
+
+func (self *Texture) Pixel(x, y int, color *Color) {
+	C.pixel(self.data, C.int(self.realw), C.int(self.realh), C.int(x), C.int(y), C.int(color.R), C.int(color.G), C.int(color.B))
 }
 
 func (self *Texture) SetDimensions(h, w int) {
