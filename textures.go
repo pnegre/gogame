@@ -51,8 +51,6 @@ unsigned char *lockTexture(SDL_Texture *t) {
 	if (SDL_LockTexture(t, 0, &texture_data, &texture_pitch) == -1) {
 		printf("Error: %s\n", SDL_GetError());
 	}
-	//unsigned char *td = (unsigned char*) texture_data;
-	//td[0] = (unsigned char) 0;
 	return (unsigned char*) texture_data;
 }
 
@@ -60,11 +58,11 @@ void unlockTexture(SDL_Texture *t) {
 	SDL_UnlockTexture(t);
 }
 
-void pixel(unsigned char *data, int h, int v, int x, int y, int r, int g, int b) {
-	data += (x+y*h)*3;
-	*data = (unsigned char) r;
-	*data = (unsigned char) g;
-	*data = (unsigned char) b;
+void pixel(unsigned char *data, int w, int h, int x, int y, int r, int g, int b) {
+	data += (x+y*w)*3;
+	*data++ = (unsigned char) r;
+	*data++ = (unsigned char) g;
+	*data++ = (unsigned char) b;
 }
 
 */
@@ -136,6 +134,14 @@ func (self *Texture) Lock() {
 
 func (self *Texture) Unlock() {
 	C.unlockTexture(self.tex)
+}
+
+func (self *Texture) Clear() {
+	for y:=0; y<self.realh; y++ {
+		for x:=0; x<self.realw; x++ {
+			C.pixel(self.data, C.int(self.realw), C.int(self.realh), C.int(x), C.int(y), 0,0,0);
+		}
+	}
 }
 
 func (self *Texture) Pixel(x, y int, color *Color) {
