@@ -148,7 +148,7 @@ func (self *Texture) Pixel(x, y int, color *Color) {
 	C.pixel(self.data, C.int(self.realw), C.int(self.realh), C.int(x), C.int(y), C.int(color.R), C.int(color.G), C.int(color.B))
 }
 
-func (self *Texture) SetDimensions(h, w int) {
+func (self *Texture) SetDimensions(w, h int) {
 	self.dstw = w
 	self.dsth = h
 }
