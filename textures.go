@@ -150,6 +150,9 @@ func (self *Texture) Clear() {
 }
 
 func (self *Texture) Pixel(x, y int, color *Color) {
+	if x < 0 || x > self.realw || y < 0 || y > self.realh {
+		return
+	}
 	C.pixel(self.data, C.int(self.realw), C.int(self.realh), C.int(x), C.int(y), C.int(color.R), C.int(color.G), C.int(color.B))
 }
 
