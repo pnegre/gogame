@@ -13,6 +13,13 @@ package gogame
 #cgo pkg-config: sdl2
 #include "SDL.h"
 
+int initSDL() {
+	if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) != 0) {
+		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
+		return 1;
+	}
+	return 0;
+}
 
 SDL_Window * newScreen(char *title, int h, int v) {
     return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, h, v, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
@@ -41,6 +48,9 @@ var COLOR_BLUE = &Color{0, 0, 255, 255}
 
 // Use this function to create a window and a renderer (not visible to user)
 func Init(title string, h, v int) error {
+	if i := C.initSDL(); i != 0 {
+		return errors.New("Error initializing SDL")
+	}
 	screen = C.newScreen(C.CString(title), C.int(h), C.int(v))
 	renderer = C.newRenderer(screen)
 	if screen == nil || renderer == nil {

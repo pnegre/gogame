@@ -49,7 +49,7 @@ type SoundDevice struct {
 	dev C.SDL_AudioDeviceID
 }
 
-func (self *SoundDevice) NewSoundDevice() (*SoundDevice, error) {
+func NewSoundDevice() (*SoundDevice, error) {
 	dev := C.newAudioDevice()
 	if dev == 0 {
 		return nil, errors.New("Can't open audio device")
