@@ -16,12 +16,14 @@ int freqsCallback[100];
 
 void audioCallback(void* userdata, Uint8* stream, int len) {
 	int *id = (int*) userdata;
-	float v = freqsCallback[*id];
+	float v = vvs[*id];
 	float *data = (float*) stream;
 	for(int i=0; i<len / 4; i++) {
-		data[i] = amplitudesCallback[*id] * sin(v * 2 * M_PI / FREQUENCY);
-		v += freqsCallback[*id];
+		data[i] = amplitudesCallback[*id] * sin((v) * 2 * M_PI / FREQUENCY);
+		//if (abs(((v) * 2 * M_PI / FREQUENCY) - 2*M_PI) < 0.01) v = 0;
+		(v) += freqsCallback[*id];
 	}
+	vvs[*id] = v;
 }
 
 SDL_AudioDeviceID newAudioDevice() {
