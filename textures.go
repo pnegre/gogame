@@ -146,7 +146,7 @@ func (self *Texture) Unlock() {
 }
 
 func (self *Texture) Clear() {
-	C.clear(self.data, C.int(self.realw), C.int(self.realh));
+	C.clear(self.data, C.int(self.realw), C.int(self.realh))
 }
 
 func (self *Texture) Pixel(x, y int, color *Color) {
