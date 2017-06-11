@@ -19,15 +19,14 @@ var toneCache = make(map[int]*ToneGenerator)
 
 //export soundGoCallback
 func soundGoCallback(id int, ptr unsafe.Pointer, len int) {
-	tg := toneCache[id]
 	len /= 4
 	// To create a Go slice backed by a C array
 	// (without copying the original data), one needs to acquire this length
 	// at runtime and use a type conversion to a pointer to a very big array and then
 	// slice it to the length that you want (also remember to set
 	// the cap if you're using Go 1.2 or later)
-	slice := (*[1 << 30]float32)(unsafe.Pointer(ptr))[:len:len]
-	tg.feedSamples(slice)
+	slice := (*[1 << 30]float32)(ptr)[:len:len]
+	toneCache[id].feedSamples(slice)
 }
 
 type ToneGenerator struct {
