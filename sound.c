@@ -30,3 +30,8 @@ SDL_AudioDeviceID newAudioDevice(int frequency) {
 	*id = dev;
     return dev;
 }
+
+void closeAudioDevice(SDL_AudioDeviceID dev) {
+	SDL_CloseAudioDevice(dev);
+	// TODO: free de l'integer id
+}
