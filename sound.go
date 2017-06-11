@@ -8,13 +8,15 @@ package gogame
 extern void setAmplitude(int id, int amp);
 extern void setFreq(int id, int freq);
 extern void audioCallback(void* userdata, Uint8* stream, int len);
-extern SDL_AudioDeviceID newAudioDevice();
+extern SDL_AudioDeviceID newAudioDevice(int frequency);
 
 */
 import "C"
 import "errors"
 import "unsafe"
 import "math"
+
+const FREQUENCY = 44100
 
 var toneCache = make(map[int]*ToneGenerator)
 
@@ -26,17 +28,16 @@ func soundGoCallback(id int, ptr unsafe.Pointer, len int) {
 	tg.feedSamples(slice)
 }
 
-
 type ToneGenerator struct {
-	dev C.SDL_AudioDeviceID
-	amp float32
-	freq float32
-	v float32
+	dev    C.SDL_AudioDeviceID
+	amp    float32
+	freq   float32
+	v      float32
 	period int
 }
 
 func NewToneGenerator() (*ToneGenerator, error) {
-	dev := C.newAudioDevice()
+	dev := C.newAudioDevice(FREQUENCY)
 	if dev == 0 {
 		return nil, errors.New("Can't open tone generator")
 	}
@@ -56,7 +57,7 @@ func (self *ToneGenerator) Stop() {
 
 func (self *ToneGenerator) SetFreq(freq int) {
 	self.freq = float32(freq)
-	self.period = int(2*44100/self.freq)
+	self.period = int(2 * FREQUENCY / self.freq)
 }
 
 func (self *ToneGenerator) SetAmplitude(amp int) {
@@ -68,10 +69,10 @@ func (self *ToneGenerator) Close() {
 }
 
 func (self *ToneGenerator) feedSamples(data []float32) {
-	for i, j := 0,0; i<len(data); i++ {
-		data[i] = self.amp * float32(math.Sin(float64(self.v * 2 * math.Pi / 44100)))
+	for i, j := 0, 0; i < len(data); i++ {
+		data[i] = self.amp * float32(math.Sin(float64(self.v*2*math.Pi/FREQUENCY)))
 		if j > self.period {
-			self.v -= float32(self.period)*self.freq
+			self.v -= float32(self.period) * self.freq
 			j = 0
 		} else {
 			self.v += self.freq
