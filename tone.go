@@ -70,6 +70,7 @@ func (self *ToneGenerator) SetAmplitude(amp int) {
 
 func (self *ToneGenerator) Close() {
 	C.closeAudioDevice(self.dev)
+	delete(toneCache, int(self.dev))
 }
 
 func (self *ToneGenerator) feedSamples(data []float32) {
