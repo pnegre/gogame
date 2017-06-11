@@ -60,8 +60,6 @@ func (self *ToneGenerator) Stop() {
 
 func (self *ToneGenerator) SetFreq(freq int) {
 	self.freq = float32(freq)
-	self.v = 0
-	self.j = 0
 	self.period = int(2 * FREQUENCY / self.freq)
 }
 
