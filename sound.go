@@ -8,11 +8,13 @@ package gogame
 #include <stdio.h>
 #include <math.h>
 
+#define MAXTONEGENERATORS 100
+
 int FREQUENCY = 44100;
 
-float vvs[100];
-int amplitudesCallback[100];
-int freqsCallback[100];
+float vvs[MAXTONEGENERATORS];
+int amplitudesCallback[MAXTONEGENERATORS];
+int freqsCallback[MAXTONEGENERATORS];
 
 void audioCallback(void* userdata, Uint8* stream, int len) {
 	int *id = (int*) userdata;
@@ -50,6 +52,10 @@ SDL_AudioDeviceID newAudioDevice() {
     if (dev == 0) {
         SDL_Log("Failed to open audio: %s", SDL_GetError());
     }
+	if (dev >= MAXTONEGENERATORS) {
+		SDL_Log("Error: MAXTONEGENERATORS reached!!");
+		return 0;
+	}
 
 	*id = dev;
     return dev;
@@ -66,7 +72,7 @@ type ToneGenerator struct {
 func NewToneGenerator() (*ToneGenerator, error) {
 	dev := C.newAudioDevice()
 	if dev == 0 {
-		return nil, errors.New("Can't open audio device")
+		return nil, errors.New("Can't open tone generator")
 	}
 	sd := new(ToneGenerator)
 	sd.dev = dev
