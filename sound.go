@@ -31,6 +31,7 @@ type ToneGenerator struct {
 	dev C.SDL_AudioDeviceID
 	amp float32
 	freq float32
+	v float32
 }
 
 func NewToneGenerator() (*ToneGenerator, error) {
@@ -67,10 +68,16 @@ func (self *ToneGenerator) Close() {
 }
 
 func (self *ToneGenerator) feedSamples(data []float32) {
-	var v float32
-	for i:=0; i<len(data); i++ {
-		data[i] = self.amp * float32(math.Sin(float64(v * 2 * math.Pi / 44100)))
-		v += self.freq
+	var N int = int(2*44100/self.freq)
+	for i, j := 0,0; i<len(data); i++ {
+		data[i] = self.amp * float32(math.Sin(float64(self.v * 2 * math.Pi / 44100)))
+		if j > N {
+			self.v -= float32(N)*self.freq
+			j = 0
+		} else {
+			self.v += self.freq
+			j++
+		}
 	}
 	//
 	// for(int i=0, j=0; i<len / 4; i++) {
