@@ -14,6 +14,12 @@ extern SDL_AudioDeviceID newAudioDevice();
 import "C"
 import "errors"
 
+//export soundGoCallback
+func soundGoCallback() {
+	// fmt.Println("AGoFunction()")
+}
+
+
 type ToneGenerator struct {
 	dev C.SDL_AudioDeviceID
 }

@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "_cgo_export.h"
+
 #define MAXTONEGENERATORS 100
 
 int FREQUENCY = 44100;
@@ -37,6 +39,7 @@ void audioCallback(void* userdata, Uint8* stream, int len) {
 		}
 	}
 	vvs[*id] = v;
+	soundGoCallback();
 }
 
 SDL_AudioDeviceID newAudioDevice() {
