@@ -32,6 +32,7 @@ type ToneGenerator struct {
 	amp float32
 	freq float32
 	v float32
+	period int
 }
 
 func NewToneGenerator() (*ToneGenerator, error) {
@@ -55,12 +56,11 @@ func (self *ToneGenerator) Stop() {
 
 func (self *ToneGenerator) SetFreq(freq int) {
 	self.freq = float32(freq)
-	// C.setFreq(C.int(self.dev), C.int(freq))
+	self.period = int(2*44100/self.freq)
 }
 
 func (self *ToneGenerator) SetAmplitude(amp int) {
 	self.amp = float32(amp)
-	// C.setAmplitude(C.int(self.dev), C.int(amp))
 }
 
 func (self *ToneGenerator) Close() {
@@ -68,26 +68,14 @@ func (self *ToneGenerator) Close() {
 }
 
 func (self *ToneGenerator) feedSamples(data []float32) {
-	var N int = int(2*44100/self.freq)
 	for i, j := 0,0; i<len(data); i++ {
 		data[i] = self.amp * float32(math.Sin(float64(self.v * 2 * math.Pi / 44100)))
-		if j > N {
-			self.v -= float32(N)*self.freq
+		if j > self.period {
+			self.v -= float32(self.period)*self.freq
 			j = 0
 		} else {
 			self.v += self.freq
 			j++
 		}
 	}
-	//
-	// for(int i=0, j=0; i<len / 4; i++) {
-	// 	data[i] = amp * sin(v * 2 * M_PI / FREQUENCY);
-	// 	if (j > N) {
-	// 		v -= N*freq;
-	// 		j = 0;
-	// 	} else {
-	// 		v += freq;
-	// 		j++;
-	// 	}
-	// }
 }
