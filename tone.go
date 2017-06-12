@@ -65,8 +65,8 @@ func (self *ToneGenerator) Stop() {
 	C.SDL_PauseAudioDevice(self.dev, 1)
 }
 
-func (self *ToneGenerator) SetFreq(freq int) {
-	self.freq = float32(freq)
+func (self *ToneGenerator) SetFreq(freq float32) {
+	self.freq = freq
 	self.period = int(2 * FREQUENCY / self.freq)
 }
 
