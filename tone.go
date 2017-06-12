@@ -15,6 +15,7 @@ import "math"
 import "math/rand"
 
 const FREQUENCY = 44100
+const INVFREQUENCY = float32(1) / float32(FREQUENCY)
 
 var toneCache = make(map[int]*ToneGenerator)
 
@@ -67,7 +68,7 @@ func (self *ToneGenerator) Stop() {
 
 func (self *ToneGenerator) SetFreq(freq float32) {
 	self.freq = freq
-	self.period = int(2 * FREQUENCY / self.freq)
+	self.period = int(FREQUENCY / self.freq)
 }
 
 func (self *ToneGenerator) SetAmplitude(amp float32) {
@@ -82,15 +83,15 @@ func (self *ToneGenerator) Close() {
 func (self *ToneGenerator) feedSamples(data []float32) {
 	if self.genType == GENERATOR_TYPE_TONE {
 		for i := 0; i < len(data); i++ {
-			data[i] = self.amp * float32(math.Sin(float64(self.v*2*math.Pi/FREQUENCY)))
+			data[i] = self.amp * float32(math.Sin(float64(self.v*2*math.Pi*self.freq)))
+			self.v += INVFREQUENCY
 			if self.j > self.period {
-				self.v -= float32(self.period) * self.freq
+				self.v -= float32(self.j)*INVFREQUENCY
 				self.j = 0
-				} else {
-					self.v += self.freq
-					self.j++
-				}
+			} else {
+				self.j++
 			}
+		}
 	}  else if self.genType == GENERATOR_TYPE_NOISE {
 		for i := 0; i < len(data); i++ {
 			data[i] = self.amp * rand.Float32();
