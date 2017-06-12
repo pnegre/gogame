@@ -62,8 +62,8 @@ func (self *ToneGenerator) SetFreq(freq int) {
 	self.period = int(2 * FREQUENCY / self.freq)
 }
 
-func (self *ToneGenerator) SetAmplitude(amp int) {
-	self.amp = float32(amp)
+func (self *ToneGenerator) SetAmplitude(amp float32) {
+	self.amp = amp
 }
 
 func (self *ToneGenerator) Close() {
