@@ -12,10 +12,16 @@ import "C"
 import "errors"
 import "unsafe"
 import "math"
+import "math/rand"
 
 const FREQUENCY = 44100
 
 var toneCache = make(map[int]*ToneGenerator)
+
+const (
+	GENERATOR_TYPE_TONE = iota
+	GENERATOR_TYPE_NOISE
+)
 
 //export soundGoCallback
 func soundGoCallback(id int, ptr unsafe.Pointer, len int) {
@@ -30,21 +36,23 @@ func soundGoCallback(id int, ptr unsafe.Pointer, len int) {
 }
 
 type ToneGenerator struct {
-	dev    C.SDL_AudioDeviceID
-	amp    float32
-	freq   float32
-	v      float32
-	period int
-	j      int
+	genType int
+	dev     C.SDL_AudioDeviceID
+	amp     float32
+	freq    float32
+	v       float32
+	period  int
+	j       int
 }
 
-func NewToneGenerator() (*ToneGenerator, error) {
+func NewToneGenerator(genType int) (*ToneGenerator, error) {
 	dev := C.newAudioDevice(FREQUENCY)
 	if dev == 0 {
 		return nil, errors.New("Can't open tone generator")
 	}
 	sd := new(ToneGenerator)
 	sd.dev = dev
+	sd.genType = genType
 	toneCache[int(sd.dev)] = sd
 	return sd, nil
 }
@@ -72,14 +80,20 @@ func (self *ToneGenerator) Close() {
 }
 
 func (self *ToneGenerator) feedSamples(data []float32) {
-	for i := 0; i < len(data); i++ {
-		data[i] = self.amp * float32(math.Sin(float64(self.v*2*math.Pi/FREQUENCY)))
-		if self.j > self.period {
-			self.v -= float32(self.period) * self.freq
-			self.j = 0
-		} else {
-			self.v += self.freq
-			self.j++
+	if self.genType == GENERATOR_TYPE_TONE {
+		for i := 0; i < len(data); i++ {
+			data[i] = self.amp * float32(math.Sin(float64(self.v*2*math.Pi/FREQUENCY)))
+			if self.j > self.period {
+				self.v -= float32(self.period) * self.freq
+				self.j = 0
+				} else {
+					self.v += self.freq
+					self.j++
+				}
+			}
+	}  else if self.genType == GENERATOR_TYPE_NOISE {
+		for i := 0; i < len(data); i++ {
+			data[i] = self.amp * rand.Float32();
 		}
 	}
 }
