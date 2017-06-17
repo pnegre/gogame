@@ -18,11 +18,12 @@ SDL_AudioDeviceID newAudioDevice(int frequency) {
     want.freq = frequency;
     want.format = AUDIO_F32;
     want.channels = 1;
-    want.samples = 4096;
+    want.samples = 256;
     want.callback = audioCallback;
 	want.userdata = id;
 
     dev = SDL_OpenAudioDevice(NULL, 0, &want, &have, SDL_AUDIO_ALLOW_FORMAT_CHANGE);
+	printf("Freq: %d\n", have.freq);
     if (dev == 0) {
         SDL_Log("Failed to open audio: %s", SDL_GetError());
     }
