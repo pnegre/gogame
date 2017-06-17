@@ -11,7 +11,7 @@ extern void closeAudioDevice(SDL_AudioDeviceID id);
 import "C"
 import "errors"
 import "unsafe"
-import "math"
+// import "math"
 import "math/rand"
 
 const FREQUENCY = 44100
@@ -44,6 +44,7 @@ type ToneGenerator struct {
 	v       float32
 	period  int
 	j       int
+	count int
 }
 
 func NewToneGenerator(genType int) (*ToneGenerator, error) {
@@ -68,7 +69,7 @@ func (self *ToneGenerator) Stop() {
 
 func (self *ToneGenerator) SetFreq(freq float32) {
 	self.freq = freq
-	self.period = int(FREQUENCY / self.freq)
+	self.period = int(0x10000 * self.freq / FREQUENCY)
 }
 
 func (self *ToneGenerator) SetAmplitude(amp float32) {
@@ -82,19 +83,56 @@ func (self *ToneGenerator) Close() {
 
 func (self *ToneGenerator) feedSamples(data []float32) {
 	if self.genType == GENERATOR_TYPE_TONE {
-		for i := 0; i < len(data); i++ {
-			data[i] = self.amp * float32(math.Sin(float64(self.v*2*math.Pi*self.freq)))
-			self.v += INVFREQUENCY
-			if self.j > self.period {
-				self.v -= float32(self.j)*INVFREQUENCY
-				self.j = 0
+
+		/*
+
+				Tret de EMULIB
+
+
+				if(WaveCH[J].Freq>=SndRate/2) break;
+		          K=0x10000*WaveCH[J].Freq/SndRate;
+		          L1=WaveCH[J].Count;
+
+				  for(I=0;I<Samples;I++,L1+=K)
+		          {
+		            L2 = L1+K;
+		            A1 = L1&0x8000? 127:-128;
+		            if((L1^L2)&0x8000)
+		              A1=A1*(0x8000-(L1&0x7FFF)-(L2&0x7FFF))/K;
+		            Wave[I]+=A1*V;
+		          }
+		          WaveCH[J].Count=L1&0xFFFF;
+
+		*/
+
+		K := int(0x10000*self.freq/FREQUENCY);
+		L1:=self.count;
+		var A1 int
+		for i := 0; i < len(data); i, L1 = i+1, L1+K {
+			L2 := L1+K;
+			if L1&0x8000 != 0 {
+				A1 = 127
 			} else {
-				self.j++
+				A1 = -128
 			}
+			if((L1^L2)&0x8000 != 0) {
+				A1=A1*(0x8000-(L1&0x7FFF)-(L2&0x7FFF))/K;
+			}
+			data[i]=float32(A1)*self.amp;
+
+			// data[i] = self.amp * float32(math.Sin(float64(self.v*2*math.Pi*self.freq)))
+			// self.v += INVFREQUENCY
+			// if self.j > self.period {
+			// 	self.v -= float32(self.j) * INVFREQUENCY
+			// 	self.j = 0
+			// } else {
+			// 	self.j++
+			// }
 		}
-	}  else if self.genType == GENERATOR_TYPE_NOISE {
+		self.count = L1&0xFFFF
+	} else if self.genType == GENERATOR_TYPE_NOISE {
 		for i := 0; i < len(data); i++ {
-			data[i] = self.amp * rand.Float32();
+			data[i] = self.amp * rand.Float32()
 		}
 	}
 }
