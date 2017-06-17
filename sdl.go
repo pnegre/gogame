@@ -26,7 +26,7 @@ SDL_Window * newScreen(char *title, int h, int v) {
 }
 
 SDL_Renderer * newRenderer( SDL_Window * screen ) {
-    return SDL_CreateRenderer(screen, -1, SDL_RENDERER_ACCELERATED  );
+    return SDL_CreateRenderer(screen, -1, SDL_RENDERER_PRESENTVSYNC); // SDL_RENDERER_SOFTWARE ); // SDL_RENDERER_ACCELERATED  );
 }
 
 
