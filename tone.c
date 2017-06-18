@@ -16,7 +16,7 @@ SDL_AudioDeviceID newAudioDevice(int frequency) {
     SDL_AudioDeviceID dev;
     SDL_memset(&want, 0, sizeof(want));
     want.freq = frequency;
-    want.format = AUDIO_F32;
+    want.format = AUDIO_S16;
     want.channels = 1;
     want.samples = 256;
     want.callback = audioCallback;

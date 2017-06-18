@@ -19,23 +19,23 @@ const (
 	GENERATOR_TYPE_NOISE
 )
 
-var theCallback func([]float32)
+var theCallback func([]int16)
 
 //export soundGoCallback
 func soundGoCallback(id int, ptr unsafe.Pointer, len int) {
-	len /= 4
+	len /= 2
 	// To create a Go slice backed by a C array
 	// (without copying the original data), one needs to acquire this length
 	// at runtime and use a type conversion to a pointer to a very big array and then
 	// slice it to the length that you want (also remember to set
 	// the cap if you're using Go 1.2 or later)
-	slice := (*[1 << 30]float32)(ptr)[:len:len]
+	slice := (*[1 << 30]int16)(ptr)[:len:len]
 	if theCallback != nil {
 		theCallback(slice)
 	}
 }
 
-func RegisterSoundCallback(fnc func([]float32)) {
+func RegisterSoundCallback(fnc func([]int16)) {
 	theCallback = fnc
 }
 
