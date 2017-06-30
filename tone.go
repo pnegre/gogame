@@ -13,13 +13,13 @@ import "C"
 import "errors"
 import "unsafe"
 
+type funcCallbackType func([]int16)
 
-const (
-	GENERATOR_TYPE_TONE = iota
-	GENERATOR_TYPE_NOISE
-)
+var mapa map[int]*AudioDevice
 
-var theCallback func([]int16)
+func init() {
+	mapa = make(map[int]*AudioDevice)
+}
 
 //export soundGoCallback
 func soundGoCallback(id int, ptr unsafe.Pointer, len int) {
@@ -30,22 +30,19 @@ func soundGoCallback(id int, ptr unsafe.Pointer, len int) {
 	// slice it to the length that you want (also remember to set
 	// the cap if you're using Go 1.2 or later)
 	slice := (*[1 << 30]int16)(ptr)[:len:len]
-	if theCallback != nil {
-		theCallback(slice)
+	for k, v := range mapa {
+		if k == id {
+			v.callback(slice)
+		}
 	}
+	// if theCallback != nil {
+	// 	theCallback(slice)
+	// }
 }
-
-func RegisterSoundCallback(fnc func([]int16)) {
-	theCallback = fnc
-}
-
-// func MixAudio(src unsafe.Pointer, dst unsafe.Pointer, lg int) {
-// 	C.mixAudio(src, dst, C.int(lg))
-// }
 
 type AudioDevice struct {
-	dev       C.SDL_AudioDeviceID
-	frequency int
+	dev      C.SDL_AudioDeviceID
+	callback funcCallbackType
 }
 
 func NewAudioDevice(frequency int) (*AudioDevice, error) {
@@ -55,8 +52,12 @@ func NewAudioDevice(frequency int) (*AudioDevice, error) {
 	}
 	sd := new(AudioDevice)
 	sd.dev = dev
-	sd.frequency = frequency
 	return sd, nil
+}
+
+func (self *AudioDevice) SetCallback(fnc funcCallbackType) {
+	self.callback = fnc
+	mapa[int(self.dev)] = self
 }
 
 func (self *AudioDevice) Start() {
