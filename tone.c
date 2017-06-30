@@ -36,7 +36,3 @@ void closeAudioDevice(SDL_AudioDeviceID dev) {
 	SDL_CloseAudioDevice(dev);
 	// TODO: free de l'integer id
 }
-
-void mixAudio(void *src, void* dst, int len) {
-	SDL_MixAudio(dst, src, len, SDL_MIX_MAXVOLUME / 2);
-}

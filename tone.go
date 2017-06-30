@@ -35,9 +35,6 @@ func soundGoCallback(id int, ptr unsafe.Pointer, len int) {
 			v.callback(slice)
 		}
 	}
-	// if theCallback != nil {
-	// 	theCallback(slice)
-	// }
 }
 
 type AudioDevice struct {
