@@ -113,3 +113,9 @@ func DrawPixel(x, y int, color *Color) {
 	C.SDL_SetRenderDrawColor(renderer, C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.A))
 	C.SDL_RenderDrawPoint(renderer, C.int(x), C.int(y))
 }
+
+// Draw line
+func DrawLine(x1, y1, x2, y2 int, color *Color) {
+	C.SDL_SetRenderDrawColor(renderer, C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.A))
+	C.SDL_RenderDrawLine(renderer, C.int(x1), C.int(y1), C.int(x2), C.int(y2))
+}
