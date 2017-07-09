@@ -22,11 +22,11 @@ int initSDL() {
 }
 
 SDL_Window * newScreen(char *title, int h, int v) {
-    return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, h, v, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    return SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, h, v, SDL_WINDOW_RESIZABLE);
 }
 
 SDL_Renderer * newRenderer( SDL_Window * screen ) {
-    return SDL_CreateRenderer(screen, -1, SDL_RENDERER_PRESENTVSYNC); // SDL_RENDERER_SOFTWARE ); // SDL_RENDERER_ACCELERATED  );
+    return SDL_CreateRenderer(screen, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED); // SDL_RENDERER_SOFTWARE ); // SDL_RENDERER_ACCELERATED  );
 }
 
 
