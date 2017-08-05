@@ -26,7 +26,18 @@ SDL_Window * newScreen(char *title, int h, int v) {
 }
 
 SDL_Renderer * newRenderer( SDL_Window * screen ) {
-    return SDL_CreateRenderer(screen, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED); // SDL_RENDERER_SOFTWARE ); // SDL_RENDERER_ACCELERATED  );
+    SDL_Renderer * r = SDL_CreateRenderer(screen, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED); // SDL_RENDERER_SOFTWARE ); // SDL_RENDERER_ACCELERATED  );
+	return r;
+}
+
+void setScaleQuality(int n) {
+	switch(n) {
+	case 1:
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+		break;
+	case 2:
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
+	}
 }
 
 
@@ -57,6 +68,10 @@ func Init(title string, h, v int) error {
 		return errors.New("Error on initializing SDL2")
 	}
 	return nil
+}
+
+func SetScaleQuality(n int) {
+	C.setScaleQuality(C.int(n))
 }
 
 // Full Screen mode
