@@ -74,8 +74,20 @@ void clear(unsigned char *data, int w, int h) {
 		}
 }
 
+int isNull(void *pointer) {
+	if (pointer == NULL) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
 */
 import "C"
+import (
+	"fmt"
+	"unsafe"
+)
 
 type Drawable interface {
 	BlitRect(*Rect)
@@ -121,9 +133,12 @@ func NewTexture(filename string) *Texture {
 	return getNewTexture(tex)
 }
 
-func NewEmptyTexture(w, h int) *Texture {
+func NewEmptyTexture(w, h int) (*Texture, error) {
 	tex := C.makeEmptyTexture(renderer, C.int(w), C.int(h))
-	return getNewTexture(tex)
+	if C.isNull(unsafe.Pointer(tex)) == 1 {
+		return nil, fmt.Errorf("Error creating texture")
+	}
+	return getNewTexture(tex), nil
 }
 
 func getNewTexture(tex *C.SDL_Texture) *Texture {
