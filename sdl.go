@@ -21,7 +21,10 @@ extern int isNull(void *pointer);
 
 */
 import "C"
-import "errors"
+import (
+	"errors"
+	"unsafe"
+)
 
 var screen *C.SDL_Window
 var renderer *C.SDL_Renderer
@@ -41,7 +44,13 @@ func Init(title string, h, v int) error {
 		return errors.New("Error initializing SDL")
 	}
 	screen = C.newScreen(C.CString(title), C.int(h), C.int(v))
+	if C.isNull(unsafe.Pointer(screen)) == 1 {
+		return errors.New("Error initalizing SCREEN")
+	}
 	renderer = C.newRenderer(screen)
+	if C.isNull(unsafe.Pointer(renderer)) == 1 {
+		return errors.New("Error initalizing RENDERER")
+	}
 	if screen == nil || renderer == nil {
 		return errors.New("Error on initializing SDL2")
 	}
