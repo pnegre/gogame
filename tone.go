@@ -66,5 +66,6 @@ func (self *AudioDevice) Stop() {
 }
 
 func (self *AudioDevice) Close() {
+	C.SDL_PauseAudioDevice(self.dev, 1)
 	C.closeAudioDevice(self.dev)
 }
