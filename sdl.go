@@ -121,3 +121,10 @@ func DrawLine(x1, y1, x2, y2 int, color *Color) {
 	C.SDL_SetRenderDrawColor(renderer, C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.A))
 	C.SDL_RenderDrawLine(renderer, C.int(x1), C.int(y1), C.int(x2), C.int(y2))
 }
+
+// Draw rectangle
+func DrawRect(x1, y1, x2, y2 int, color *Color) {
+	C.SDL_SetRenderDrawColor(renderer, C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.A))
+	r := &C.SDL_Rect{x: C.int(x1), y: C.int(y1), w: C.int(x2 - x1), h: C.int(y2 - y1)}
+	C.SDL_RenderDrawRect(renderer, r)
+}
