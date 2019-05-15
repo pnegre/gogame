@@ -8,7 +8,7 @@ SDL_Texture * makeTexture( char *f, SDL_Renderer *ren ) {
     return tex;
 }
 
-void renderGOOD( SDL_Renderer *ren, SDL_Texture *tex, int ox, int oy, int x, int y, int w, int h, int dw, int dh) {
+void renderGOOD( SDL_Renderer *ren, SDL_Texture *tex, int ox, int oy, int x, int y, int w, int h, int dw, int dh, int angle, SDL_RendererFlip flip) {
     static SDL_Rect org;
     static SDL_Rect dst;
     org.x = ox;
@@ -19,7 +19,7 @@ void renderGOOD( SDL_Renderer *ren, SDL_Texture *tex, int ox, int oy, int x, int
     dst.y = y;
     dst.w = dw;
     dst.h = dh;
-    SDL_RenderCopy(ren, tex, &org, &dst);
+    SDL_RenderCopyEx(ren, tex, &org, &dst, angle, NULL, flip);
 }
 
 void queryTexture(SDL_Texture *t, int *h, int *v) {

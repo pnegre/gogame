@@ -8,7 +8,7 @@ package gogame
 #include <stdio.h>
 
 extern SDL_Texture * makeTexture( char *f, SDL_Renderer *ren );
-extern void renderGOOD( SDL_Renderer *ren, SDL_Texture *tex, int ox, int oy, int x, int y, int w, int h, int dw, int dh);
+extern void renderGOOD( SDL_Renderer *ren, SDL_Texture *tex, int ox, int oy, int x, int y, int w, int h, int dw, int dh, int angle, SDL_RendererFlip flip);
 extern void queryTexture(SDL_Texture *t, int *h, int *v);
 extern int intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
 extern SDL_Texture *makeEmptyTexture(SDL_Renderer *ren, int w, int h);
@@ -24,6 +24,14 @@ import "C"
 import (
 	"fmt"
 	"unsafe"
+)
+
+type Flip int
+
+const (
+	FLIP_HORIZONTAL Flip = iota
+	FLIP_VERTICAL
+	FLIP_NONE
 )
 
 type Drawable interface {
@@ -125,13 +133,28 @@ func (self *Texture) GetDimensions() (int, int) {
 
 func (self *Texture) Blit(x, y int) {
 	C.renderGOOD(renderer, self.tex, C.int(0), C.int(0), C.int(x), C.int(y), C.int(self.realw),
-		C.int(self.realh), C.int(self.dstw), C.int(self.dsth))
+		C.int(self.realh), C.int(self.dstw), C.int(self.dsth), 0, C.SDL_FLIP_NONE)
 }
 
 // Blit texture to screen, using provided rect
 func (self *Texture) BlitRect(r *Rect) {
 	C.renderGOOD(renderer, self.tex, C.int(0), C.int(0), C.int(r.X), C.int(r.Y), C.int(self.realw),
-		C.int(self.realh), C.int(r.W), C.int(r.H))
+		C.int(self.realh), C.int(r.W), C.int(r.H), 0, C.SDL_FLIP_NONE)
+}
+
+// Blit texture to screen, using provided rect, angle and flip
+func (self *Texture) BlitRectEx(r *Rect, angle int, flip Flip) {
+	var cfl C.SDL_RendererFlip = C.SDL_FLIP_NONE
+	switch flip {
+	case FLIP_VERTICAL:
+		cfl = C.SDL_FLIP_VERTICAL
+	case FLIP_HORIZONTAL:
+		cfl = C.SDL_FLIP_HORIZONTAL
+	case FLIP_NONE:
+		cfl = C.SDL_FLIP_NONE
+	}
+	C.renderGOOD(renderer, self.tex, C.int(0), C.int(0), C.int(r.X), C.int(r.Y), C.int(self.realw),
+		C.int(self.realh), C.int(r.W), C.int(r.H), C.int(angle), cfl)
 }
 
 // Get subtexture
@@ -152,13 +175,13 @@ func (self *SubTexture) SetDimensions(w, h int) {
 
 func (self *SubTexture) Blit(x, y int) {
 	C.renderGOOD(renderer, self.tex.tex, C.int(self.rect.X), C.int(self.rect.Y), C.int(x), C.int(y), C.int(self.rect.W),
-		C.int(self.rect.H), C.int(self.dstw), C.int(self.dsth))
+		C.int(self.rect.H), C.int(self.dstw), C.int(self.dsth), 0, C.SDL_FLIP_NONE)
 }
 
 // Blit subtexture to screen, using provided rect
 func (self *SubTexture) BlitRect(r *Rect) {
 	C.renderGOOD(renderer, self.tex.tex, C.int(self.rect.X), C.int(self.rect.Y), C.int(r.X), C.int(r.Y), C.int(self.rect.W),
-		C.int(self.rect.H), C.int(r.W), C.int(r.H))
+		C.int(self.rect.H), C.int(r.W), C.int(r.H), 0, C.SDL_FLIP_NONE)
 }
 
 // Get subtexture dimensions
