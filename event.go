@@ -47,6 +47,19 @@ void getMouseWheel(SDL_Event *e, int *x, int *y) {
     *y = e->wheel.y;
 }
 
+int getMouseButton(int b) {
+	if (b & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+		return 1;
+	}
+	if (b & SDL_BUTTON(SDL_BUTTON_MIDDLE)) {
+		return 2;
+	}
+	if (b & SDL_BUTTON(SDL_BUTTON_RIGHT)) {
+		return 3;
+	}
+	return 0;
+}
+
 */
 import "C"
 
@@ -248,4 +261,26 @@ func SlurpEvents() (quit bool) {
 // Returns true if key is pressed, false otherwise
 func IsKeyPressed(kcode int) bool {
 	return C.isKeyPressed(C.int(kcode)) == 1
+}
+
+const (
+	MOUSE_BUTTON_LEFT = iota + 1
+	MOUSE_BUTTON_RIGHT
+	MOUSE_BUTTON_MIDDLE
+)
+
+// Retrieve the current state of the mouse
+func GetMouseState() (x int, y int, buttons int) {
+	var xx, yy C.int
+	bb := C.int(C.SDL_GetMouseState(&xx, &yy))
+	switch C.getMouseButton(bb) {
+	case 1:
+		buttons = MOUSE_BUTTON_LEFT
+	case 2:
+		buttons = MOUSE_BUTTON_MIDDLE
+	case 3:
+		buttons = MOUSE_BUTTON_RIGHT
+	}
+	x, y = int(xx), int(yy)
+	return
 }
