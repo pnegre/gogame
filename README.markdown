@@ -45,6 +45,7 @@ Simple example:
         "github.com/pnegre/gogame/cache"
         "github.com/pnegre/gogame/sprite"
         "log"
+        "runtime"
     )
 
     const (
@@ -75,6 +76,7 @@ Simple example:
     }
 
     func main() {
+        runtime.LockOSThread()
         if err := gogame.Init(WINTITLE, WIN_W, WIN_H); err != nil {
             log.Fatal(err)
         }
