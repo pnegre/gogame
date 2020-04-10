@@ -137,3 +137,10 @@ func DrawFilledTriangle(x1, y1, x2, y2, x3, y3 int, color *Color) {
 		C.short(x2), C.short(y2), C.short(x3), C.short(y3),
 		C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.A))
 }
+
+// Draw filled rectangle
+func DrawFilledRectangle(x1, y1, x2, y2 int, color *Color) {
+	C.SDL_SetRenderDrawColor(renderer, C.Uint8(color.R), C.Uint8(color.G), C.Uint8(color.B), C.Uint8(color.A))
+	r := &C.SDL_Rect{x: C.int(x1), y: C.int(y1), w: C.int(x2 - x1), h: C.int(y2 - y1)}
+	C.SDL_RenderFillRect(renderer, r)
+}
