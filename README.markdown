@@ -2,37 +2,13 @@
 
 This is a simple 2D game library for Go. It's incomplete and I'm writing it for my personal projects. Feel free to suggest features!!
 
-## Install instructions (linux only)
-
-I use debian. If you're like me, you will need to install the following packages:
-
-    libsdl2-dev
-    libsdl2-image-dev
-    libsdl2-ttf-dev
-
-Others distros shoud have equivalent libraries avaliable.
-
-And now, the easy part (make sure you have a valid $GOPATH):
-
-    go get github.com/pnegre/gogame
-
-Finally, compile the library and install it:
-
-    go install github.com/pnegre/gogame
-
 ## Documentation
 
 Once you have installed the package, just run:
 
-    godoc github.com/pnegre/gogame | less
-    godoc github.com/pnegre/gogame/sprite | less
-    godoc github.com/pnegre/gogame/cache | less
-
-Or you may prefer to view on the web browser:
-
-    godoc -http=:6060
-
-Point your browser to http://localhost:6060/pkg/github.com/pnegre/gogame
+    go doc github.com/pnegre/gogame | less
+    go doc github.com/pnegre/gogame/sprite | less
+    go doc github.com/pnegre/gogame/cache | less
 
 ## Usage
 
@@ -52,7 +28,7 @@ Simple example:
         WINTITLE = "test"
         WIN_W    = 800
         WIN_H    = 600
-        IMAGE    = "someimage.png"
+        IMAGE    = "sprite.png"
     )
 
     type Target struct {
@@ -73,10 +49,19 @@ Simple example:
         if gogame.IsKeyPressed(gogame.K_RIGHT) {
             self.Rect.X += 10
         }
+        if gogame.IsKeyPressed(gogame.K_UP) {
+            self.Rect.Y -= 10
+        }
+        if gogame.IsKeyPressed(gogame.K_DOWN) {
+            self.Rect.Y += 10
+        }
     }
 
     func main() {
         runtime.LockOSThread()
+        if err := gogame.InitSDL(); err != nil {
+            log.Fatal(err)
+        }
         if err := gogame.Init(WINTITLE, WIN_W, WIN_H); err != nil {
             log.Fatal(err)
         }
@@ -96,9 +81,7 @@ Simple example:
             target.Draw()
             gogame.RenderPresent()
 
-            gogame.Delay(50)
+            gogame.Delay(16)
         }
 
     }
-
-
