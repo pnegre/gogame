@@ -20,7 +20,7 @@ extern SDL_Window * newScreen(char *title, int h, int v);
 extern SDL_Renderer * newRenderer( SDL_Window * screen );
 extern void setScaleQuality(int n);
 extern int isNull(void *pointer);
-
+extern void getDesktopDisplayResolution(int displayIndex, int *w, int *h);
 */
 import "C"
 import (
@@ -40,11 +40,15 @@ var COLOR_BLACK = &Color{0, 0, 0, 255}
 var COLOR_RED = &Color{255, 0, 0, 255}
 var COLOR_BLUE = &Color{0, 0, 255, 255}
 
-// Use this function to create a window and a renderer (not visible to user)
-func Init(title string, h, v int) error {
+func InitSDL() error {
 	if i := C.initSDL(); i != 0 {
 		return errors.New("Error initializing SDL")
 	}
+	return nil
+}
+
+// Use this function to create a window and a renderer (not visible to user)
+func Init(title string, h, v int) error {
 	screen = C.newScreen(C.CString(title), C.int(h), C.int(v))
 	if C.isNull(unsafe.Pointer(screen)) == 1 {
 		return errors.New("Error initalizing SCREEN")
@@ -87,6 +91,12 @@ func SetWindowSize(h, v int) {
 // Set a device independent resolution for rendering
 func SetLogicalSize(h, v int) {
 	C.SDL_RenderSetLogicalSize(renderer, C.int(h), C.int(v))
+}
+
+func GetDesktopDisplayResolution() (int, int) {
+	var w, h C.int
+	C.getDesktopDisplayResolution(0, &w, &h)
+	return int(w), int(h)
 }
 
 // Destroys renderer and window

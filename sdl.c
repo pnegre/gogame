@@ -34,3 +34,15 @@ int isNull(void *pointer) {
 		return 0;
 	}
 }
+
+void getDesktopDisplayResolution(int displayIndex, int *w, int *h) {
+	SDL_DisplayMode dm;
+	if (SDL_GetDesktopDisplayMode(displayIndex, &dm) != 0) {
+		SDL_Log("SDL_GetDesktopDisplayMode Error: %s", SDL_GetError());
+		*w = 800; // Default width
+		*h = 600; // Default height
+	} else {
+		*w = dm.w;
+		*h = dm.h;
+	}
+}
