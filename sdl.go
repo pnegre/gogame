@@ -40,6 +40,8 @@ var COLOR_BLACK = &Color{0, 0, 0, 255}
 var COLOR_RED = &Color{255, 0, 0, 255}
 var COLOR_BLUE = &Color{0, 0, 255, 255}
 
+// InitSDL initializes the SDL library. It must be called before any other function in this package.
+// It returns an error if SDL could not be initialized.
 func InitSDL() error {
 	if i := C.initSDL(); i != 0 {
 		return errors.New("Error initializing SDL")
