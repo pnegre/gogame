@@ -105,6 +105,13 @@ func (self *Texture) Unlock() {
 	C.unlockTexture(self.tex)
 }
 
+func (self *Texture) Update(pixels []byte) {
+	self.Lock()
+	C.memcpy(unsafe.Pointer(self.data), unsafe.Pointer(&pixels[0]),
+		C.size_t(len(pixels)))
+	self.Unlock()
+}
+
 func (self *Texture) Clear() {
 	C.clear(self.data, C.int(self.realw), C.int(self.realh))
 }
