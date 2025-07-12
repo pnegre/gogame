@@ -35,7 +35,7 @@ int intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2) {
 }
 
 SDL_Texture *makeEmptyTexture(SDL_Renderer *ren, int w, int h) {
-	SDL_Texture *t = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, w, h);
+	SDL_Texture *t = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, w, h);
 	if (t == NULL) {
 		printf("Error creating empty texture: %s\n", SDL_GetError());
 	}
@@ -55,11 +55,12 @@ void unlockTexture(SDL_Texture *t) {
 	SDL_UnlockTexture(t);
 }
 
-void pixel(unsigned char *data, int w, int h, int x, int y, int r, int g, int b) {
-	data += (x+y*w)*3;
+void pixel(unsigned char *data, int w, int h, int x, int y, int r, int g, int b, int a) {
+	data += (x+y*w)*4;
 	*data++ = (unsigned char) r;
 	*data++ = (unsigned char) g;
 	*data++ = (unsigned char) b;
+	*data++ = (unsigned char) a;
 }
 
 void clear(unsigned char *data, int w, int h) {

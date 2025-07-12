@@ -14,7 +14,7 @@ extern int intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w2, in
 extern SDL_Texture *makeEmptyTexture(SDL_Renderer *ren, int w, int h);
 extern unsigned char *lockTexture(SDL_Texture *t);
 extern void unlockTexture(SDL_Texture *t);
-extern void pixel(unsigned char *data, int w, int h, int x, int y, int r, int g, int b);
+extern void pixel(unsigned char *data, int w, int h, int x, int y, int r, int g, int b, int a);
 extern void clear(unsigned char *data, int w, int h);
 extern int isNull(void *pointer);
 
@@ -120,7 +120,7 @@ func (self *Texture) Pixel(x, y int, color *Color) {
 	if x < 0 || x > self.realw || y < 0 || y > self.realh {
 		return
 	}
-	C.pixel(self.data, C.int(self.realw), C.int(self.realh), C.int(x), C.int(y), C.int(color.R), C.int(color.G), C.int(color.B))
+	C.pixel(self.data, C.int(self.realw), C.int(self.realh), C.int(x), C.int(y), C.int(color.R), C.int(color.G), C.int(color.B), C.int(color.A))
 }
 
 func (self *Texture) SetDimensions(w, h int) {
